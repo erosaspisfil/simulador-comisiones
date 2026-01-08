@@ -176,7 +176,7 @@ with st.sidebar:
     st.markdown("---")
     
     sueldo_fijo = st.number_input(
-        "💵 Sueldo Fijo (S/.)", 
+        "💵 Sueldo Fijo (S/)", 
         min_value=0, 
         value=3100, 
         step=100,
@@ -184,7 +184,7 @@ with st.sidebar:
     )
     
     sueldo_variable = st.number_input(
-        "📈 Sueldo Variable (S/.)", 
+        "📈 Sueldo Variable (S/)", 
         min_value=0, 
         value=3000, 
         step=100,
@@ -199,9 +199,9 @@ with st.sidebar:
     <div class="info-box">
         <strong>📋 Resumen de Compensación</strong><br>
         <small>
-        • Sueldo Fijo: <b>S/. {sueldo_fijo:,.0f}</b><br>
-        • Sueldo Variable (100%): <b>S/. {sueldo_variable:,.0f}</b><br>
-        • <strong>Total al 100%: S/. {total_al_100:,.0f}</strong>
+        • Sueldo Fijo: <b>S/ {sueldo_fijo:,.0f}</b><br>
+        • Sueldo Variable (100%): <b>S/ {sueldo_variable:,.0f}</b><br>
+        • <strong>Total al 100%: S/ {total_al_100:,.0f}</strong>
         </small>
     </div>
     """, unsafe_allow_html=True)
@@ -266,7 +266,7 @@ with col1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Esquema Actual</div>
-        <div class="metric-value actual">S/. {sueldo_actual:,.0f}</div>
+        <div class="metric-value actual">S/ {sueldo_actual:,.0f}</div>
         <small style="color: #94a3b8;">Sueldo Fijo + Variable × Efectividad</small>
     </div>
     """, unsafe_allow_html=True)
@@ -275,7 +275,7 @@ with col2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Esquema Nuevo</div>
-        <div class="metric-value nuevo">S/. {sueldo_nuevo:,.0f}</div>
+        <div class="metric-value nuevo">S/ {sueldo_nuevo:,.0f}</div>
         <small style="color: #94a3b8;">Sueldo Fijo + Variable × % Tabla</small>
     </div>
     """, unsafe_allow_html=True)
@@ -287,7 +287,7 @@ with col3:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Diferencia</div>
-        <div class="metric-value {clase_diferencia}">{emoji} {signo}S/. {diferencia:,.0f}</div>
+        <div class="metric-value {clase_diferencia}">{emoji} {signo}S/ {diferencia:,.0f}</div>
         <small style="color: #94a3b8;">{abs(diferencia/sueldo_actual*100):.1f}% {'más' if diferencia >= 0 else 'menos'}</small>
     </div>
     """, unsafe_allow_html=True)
@@ -328,7 +328,7 @@ fig.add_trace(go.Scatter(
     y=sueldos_actuales,
     name="Esquema Actual",
     line=dict(color="#6366f1", width=3),
-    hovertemplate="Efectividad: %{x}%<br>Sueldo Actual: S/. %{y:,.0f}<extra></extra>"
+    hovertemplate="Efectividad: %{x}%<br>Sueldo Actual: S/ %{y:,.0f}<extra></extra>"
 ))
 
 fig.add_trace(go.Scatter(
@@ -336,7 +336,7 @@ fig.add_trace(go.Scatter(
     y=sueldos_nuevos,
     name="Esquema Nuevo",
     line=dict(color="#10b981", width=3),
-    hovertemplate="Efectividad: %{x}%<br>Sueldo Nuevo: S/. %{y:,.0f}<extra></extra>"
+    hovertemplate="Efectividad: %{x}%<br>Sueldo Nuevo: S/ %{y:,.0f}<extra></extra>"
 ))
 
 # Punto actual del vendedor
@@ -346,7 +346,7 @@ fig.add_trace(go.Scatter(
     mode="markers",
     name="Tu posición (Actual)",
     marker=dict(color="#6366f1", size=15, symbol="circle", line=dict(width=2, color="white")),
-    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Actual: S/. {sueldo_actual:,.0f}<extra></extra>"
+    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Actual: S/ {sueldo_actual:,.0f}<extra></extra>"
 ))
 
 fig.add_trace(go.Scatter(
@@ -355,7 +355,7 @@ fig.add_trace(go.Scatter(
     mode="markers",
     name="Tu posición (Nuevo)",
     marker=dict(color="#10b981", size=15, symbol="diamond", line=dict(width=2, color="white")),
-    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Nuevo: S/. {sueldo_nuevo:,.0f}<extra></extra>"
+    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Nuevo: S/ {sueldo_nuevo:,.0f}<extra></extra>"
 ))
 
 # Líneas verticales de referencia
@@ -376,9 +376,9 @@ fig.update_layout(
         gridcolor="rgba(0,0,0,0.05)"
     ),
     yaxis=dict(
-        title="Sueldo Total (S/.)",
+        title="Sueldo Total (S/)",
         tickformat=",",
-        tickprefix="S/. ",
+        tickprefix="S/ ",
         gridcolor="rgba(0,0,0,0.05)"
     ),
     legend=dict(
@@ -455,7 +455,7 @@ with col1:
         measure=["relative", "relative", "total"],
         x=["Sueldo Fijo", "Sueldo Variable", "TOTAL"],
         y=[sueldo_fijo, variable_actual, 0],
-        text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {variable_actual:,.0f}", f"S/. {sueldo_actual:,.0f}"],
+        text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {variable_actual:,.0f}", f"S/ {sueldo_actual:,.0f}"],
         textposition="outside",
         connector={"line": {"color": "#6366f1"}},
         increasing={"marker": {"color": "#818cf8"}},
@@ -466,7 +466,7 @@ with col1:
         title=dict(text=f"<b>Esquema Actual ({efectividad}% efectividad)</b>", font=dict(size=14)),
         showlegend=False,
         height=350,
-        yaxis=dict(tickformat=",", tickprefix="S/. ")
+        yaxis=dict(tickformat=",", tickprefix="S/ ")
     )
     
     st.plotly_chart(fig_actual, use_container_width=True)
@@ -483,7 +483,7 @@ with col2:
             measure=["relative", "relative", "total"],
             x=["Sueldo Fijo", "Sueldo Variable", "TOTAL"],
             y=[sueldo_fijo, variable_nuevo, 0],
-            text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {variable_nuevo:,.0f}", f"S/. {sueldo_nuevo:,.0f}"],
+            text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {variable_nuevo:,.0f}", f"S/ {sueldo_nuevo:,.0f}"],
             textposition="outside",
             connector={"line": {"color": "#10b981"}},
             increasing={"marker": {"color": "#6ee7b7"}},
@@ -496,7 +496,7 @@ with col2:
             measure=["relative", "total"],
             x=["Sueldo Fijo", "TOTAL"],
             y=[sueldo_fijo, 0],
-            text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {sueldo_fijo:,.0f}"],
+            text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {sueldo_fijo:,.0f}"],
             textposition="outside",
             connector={"line": {"color": "#10b981"}},
             increasing={"marker": {"color": "#6ee7b7"}},
@@ -507,7 +507,7 @@ with col2:
         title=dict(text=f"<b>Esquema Nuevo ({porcentaje_pago:.0f}% aplicado)</b>", font=dict(size=14)),
         showlegend=False,
         height=350,
-        yaxis=dict(tickformat=",", tickprefix="S/. ")
+        yaxis=dict(tickformat=",", tickprefix="S/ ")
     )
     
     st.plotly_chart(fig_nuevo, use_container_width=True)
@@ -527,9 +527,9 @@ for e in escenarios:
     datos_escenarios.append({
         "Efectividad": f"{e}%",
         "% Pago Tabla": f"{pago:.0f}%",
-        "Esquema Actual": f"S/. {s_actual:,.0f}",
-        "Esquema Nuevo": f"S/. {s_nuevo:,.0f}",
-        "Diferencia": f"{'+'if dif>=0 else ''}S/. {dif:,.0f}",
+        "Esquema Actual": f"S/ {s_actual:,.0f}",
+        "Esquema Nuevo": f"S/ {s_nuevo:,.0f}",
+        "Diferencia": f"{'+'if dif>=0 else ''}S/ {dif:,.0f}",
         "Beneficio": "✅ Nuevo" if dif > 0 else ("⚖️ Igual" if dif == 0 else "📌 Actual")
     })
 
