@@ -176,7 +176,7 @@ with st.sidebar:
     st.markdown("---")
     
     sueldo_fijo = st.number_input(
-        "💵 Sueldo Fijo (S/)", 
+        "💵 Sueldo Fijo (S/.)", 
         min_value=0, 
         value=3100, 
         step=100,
@@ -184,7 +184,7 @@ with st.sidebar:
     )
     
     sueldo_variable = st.number_input(
-        "📈 Sueldo Variable (S/)", 
+        "📈 Sueldo Variable (S/.)", 
         min_value=0, 
         value=3000, 
         step=100,
@@ -199,28 +199,182 @@ with st.sidebar:
     <div class="info-box">
         <strong>📋 Resumen de Compensación</strong><br>
         <small>
-        • Sueldo Fijo: <b>S/ {sueldo_fijo:,.0f}</b><br>
-        • Sueldo Variable (100%): <b>S/ {sueldo_variable:,.0f}</b><br>
-        • <strong>Total al 100%: S/ {total_al_100:,.0f}</strong>
+        • Sueldo Fijo: <b>S/. {sueldo_fijo:,.0f}</b><br>
+        • Sueldo Variable (100%): <b>S/. {sueldo_variable:,.0f}</b><br>
+        • <strong>Total al 100%: S/. {total_al_100:,.0f}</strong>
         </small>
     </div>
     """, unsafe_allow_html=True)
 
 # Contenido principal
+st.markdown("### 🎯 Simula tu Efectividad de Ventas")
+
+# Campos de Cuota y Venta
+col_cuota, col_venta, col_efectividad = st.columns([1, 1, 1])
+
+with col_cuota:
+    cuota = st.number_input(
+        "📊 Cuota Mensual (S/.)",
+        min_value=1,
+        value=100000,
+        step=5000,
+        format="%d",
+        help="Tu meta de ventas mensual"
+    )
+
+with col_venta:
+    venta = st.number_input(
+        "💰 Venta Proyectada (S/.)",
+        min_value=0,
+        value=100000,
+        step=5000,
+        format="%d",
+        help="Tu venta estimada o real del mes"
+    )
+
+with col_efectividad:
+    # Calcular efectividad automáticamente
+    efectividad_calculada = (venta / cuota) * 100 if cuota > 0 else 0
+    efectividad = min(max(round(efectividad_calculada), 0), 150)  # Limitar entre 0 y 150
+    
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+                padding: 16px; border-radius: 12px; text-align: center; 
+                border: 2px solid #0ea5e9; margin-top: 8px;">
+        <div style="font-size: 0.8rem; color: #64748b; font-weight: 500;">% de Efectividad</div>
+        <div style="font-size: 2rem; font-weight: 800; color: #0284c7;">{efectividad:.0f}%</div>
+        <div style="font-size: 0.7rem; color: #94a3b8;">Venta ÷ Cuota × 100</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Barra visual de efectividad con zonas
+st.markdown("""
+<style>
+    .efectividad-bar-container {
+        margin: 20px 0 10px 0;
+    }
+    .efectividad-bar {
+        height: 12px;
+        border-radius: 6px;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .zona-critica { background: linear-gradient(90deg, #fecaca, #fca5a5); flex: 80; }
+    .zona-recuperacion { background: linear-gradient(90deg, #fde68a, #fcd34d); flex: 20; }
+    .zona-cumplimiento { background: linear-gradient(90deg, #6ee7b7, #34d399); flex: 15; }
+    .zona-alto { background: linear-gradient(90deg, #93c5fd, #60a5fa); flex: 35; }
+    
+    .marcas-container {
+        position: relative;
+        height: 30px;
+        margin-top: 4px;
+    }
+    .marca {
+        position: absolute;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+    .marca-linea {
+        width: 2px;
+        height: 8px;
+        background: #64748b;
+        margin: 0 auto;
+    }
+    .marca-texto {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+    .indicador-posicion {
+        position: absolute;
+        transform: translateX(-50%);
+        top: -28px;
+    }
+    .indicador-flecha {
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 10px solid #1e293b;
+        margin: 0 auto;
+    }
+    .indicador-valor {
+        background: #1e293b;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Calcular posición del indicador (0-150 mapeado a 0-100%)
+posicion_indicador = min((efectividad / 150) * 100, 100)
+
+st.markdown(f"""
+<div class="efectividad-bar-container">
+    <div style="position: relative; padding-top: 35px;">
+        <!-- Indicador de posición actual -->
+        <div class="indicador-posicion" style="left: {posicion_indicador}%;">
+            <div class="indicador-valor">TÚ: {efectividad:.0f}%</div>
+            <div class="indicador-flecha"></div>
+        </div>
+        
+        <!-- Barra de zonas -->
+        <div class="efectividad-bar">
+            <div class="zona-critica"></div>
+            <div class="zona-recuperacion"></div>
+            <div class="zona-cumplimiento"></div>
+            <div class="zona-alto"></div>
+        </div>
+        
+        <!-- Marcas -->
+        <div class="marcas-container">
+            <div class="marca" style="left: 0%;">
+                <div class="marca-linea"></div>
+                <div class="marca-texto">0%</div>
+            </div>
+            <div class="marca" style="left: {(80/150)*100}%;">
+                <div class="marca-linea" style="background: #ef4444;"></div>
+                <div class="marca-texto" style="color: #ef4444;">80%</div>
+            </div>
+            <div class="marca" style="left: {(100/150)*100}%;">
+                <div class="marca-linea" style="background: #f59e0b;"></div>
+                <div class="marca-texto" style="color: #f59e0b;">100%</div>
+            </div>
+            <div class="marca" style="left: {(115/150)*100}%;">
+                <div class="marca-linea" style="background: #10b981;"></div>
+                <div class="marca-texto" style="color: #10b981;">115%</div>
+            </div>
+            <div class="marca" style="left: 100%;">
+                <div class="marca-linea"></div>
+                <div class="marca-texto">150%</div>
+            </div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Leyenda de zonas
+col_z1, col_z2, col_z3, col_z4 = st.columns(4)
+with col_z1:
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#fca5a5;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Crítica (&lt;80%)</span></div>', unsafe_allow_html=True)
+with col_z2:
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#fcd34d;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Recuperación (80-&lt;100%)</span></div>', unsafe_allow_html=True)
+with col_z3:
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#34d399;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Cumplimiento (100-&lt;115%)</span></div>', unsafe_allow_html=True)
+with col_z4:
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#60a5fa;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Alto Rend. (≥115%)</span></div>', unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Indicador de zona (mensaje)
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.markdown("### 🎚️ Simula tu Efectividad de Ventas")
-    
-    efectividad = st.slider(
-        "% de Efectividad (Ventas / Cuota × 100)",
-        min_value=0,
-        max_value=150,
-        value=100,
-        step=1,
-        help="Desliza para simular diferentes escenarios de cumplimiento"
-    )
-    
     # Indicador de zona
     if efectividad < 80:
         zona_html = '<span class="zone-indicator zone-red">⚠️ ZONA CRÍTICA - Sin sueldo variable</span>'
@@ -266,7 +420,7 @@ with col1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Esquema Actual</div>
-        <div class="metric-value actual">S/ {sueldo_actual:,.0f}</div>
+        <div class="metric-value actual">S/. {sueldo_actual:,.0f}</div>
         <small style="color: #94a3b8;">Sueldo Fijo + Variable × Efectividad</small>
     </div>
     """, unsafe_allow_html=True)
@@ -275,7 +429,7 @@ with col2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Esquema Nuevo</div>
-        <div class="metric-value nuevo">S/ {sueldo_nuevo:,.0f}</div>
+        <div class="metric-value nuevo">S/. {sueldo_nuevo:,.0f}</div>
         <small style="color: #94a3b8;">Sueldo Fijo + Variable × % Tabla</small>
     </div>
     """, unsafe_allow_html=True)
@@ -287,7 +441,7 @@ with col3:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Diferencia</div>
-        <div class="metric-value {clase_diferencia}">{emoji} {signo}S/ {diferencia:,.0f}</div>
+        <div class="metric-value {clase_diferencia}">{emoji} {signo}S/. {diferencia:,.0f}</div>
         <small style="color: #94a3b8;">{abs(diferencia/sueldo_actual*100):.1f}% {'más' if diferencia >= 0 else 'menos'}</small>
     </div>
     """, unsafe_allow_html=True)
@@ -328,7 +482,7 @@ fig.add_trace(go.Scatter(
     y=sueldos_actuales,
     name="Esquema Actual",
     line=dict(color="#6366f1", width=3),
-    hovertemplate="Efectividad: %{x}%<br>Sueldo Actual: S/ %{y:,.0f}<extra></extra>"
+    hovertemplate="Efectividad: %{x}%<br>Sueldo Actual: S/. %{y:,.0f}<extra></extra>"
 ))
 
 fig.add_trace(go.Scatter(
@@ -336,7 +490,7 @@ fig.add_trace(go.Scatter(
     y=sueldos_nuevos,
     name="Esquema Nuevo",
     line=dict(color="#10b981", width=3),
-    hovertemplate="Efectividad: %{x}%<br>Sueldo Nuevo: S/ %{y:,.0f}<extra></extra>"
+    hovertemplate="Efectividad: %{x}%<br>Sueldo Nuevo: S/. %{y:,.0f}<extra></extra>"
 ))
 
 # Punto actual del vendedor
@@ -346,7 +500,7 @@ fig.add_trace(go.Scatter(
     mode="markers",
     name="Tu posición (Actual)",
     marker=dict(color="#6366f1", size=15, symbol="circle", line=dict(width=2, color="white")),
-    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Actual: S/ {sueldo_actual:,.0f}<extra></extra>"
+    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Actual: S/. {sueldo_actual:,.0f}<extra></extra>"
 ))
 
 fig.add_trace(go.Scatter(
@@ -355,7 +509,7 @@ fig.add_trace(go.Scatter(
     mode="markers",
     name="Tu posición (Nuevo)",
     marker=dict(color="#10b981", size=15, symbol="diamond", line=dict(width=2, color="white")),
-    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Nuevo: S/ {sueldo_nuevo:,.0f}<extra></extra>"
+    hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Nuevo: S/. {sueldo_nuevo:,.0f}<extra></extra>"
 ))
 
 # Líneas verticales de referencia
@@ -376,9 +530,9 @@ fig.update_layout(
         gridcolor="rgba(0,0,0,0.05)"
     ),
     yaxis=dict(
-        title="Sueldo Total (S/)",
+        title="Sueldo Total (S/.)",
         tickformat=",",
-        tickprefix="S/ ",
+        tickprefix="S/. ",
         gridcolor="rgba(0,0,0,0.05)"
     ),
     legend=dict(
@@ -455,7 +609,7 @@ with col1:
         measure=["relative", "relative", "total"],
         x=["Sueldo Fijo", "Sueldo Variable", "TOTAL"],
         y=[sueldo_fijo, variable_actual, 0],
-        text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {variable_actual:,.0f}", f"S/ {sueldo_actual:,.0f}"],
+        text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {variable_actual:,.0f}", f"S/. {sueldo_actual:,.0f}"],
         textposition="outside",
         connector={"line": {"color": "#6366f1"}},
         increasing={"marker": {"color": "#818cf8"}},
@@ -466,7 +620,7 @@ with col1:
         title=dict(text=f"<b>Esquema Actual ({efectividad}% efectividad)</b>", font=dict(size=14)),
         showlegend=False,
         height=350,
-        yaxis=dict(tickformat=",", tickprefix="S/ ")
+        yaxis=dict(tickformat=",", tickprefix="S/. ")
     )
     
     st.plotly_chart(fig_actual, use_container_width=True)
@@ -483,7 +637,7 @@ with col2:
             measure=["relative", "relative", "total"],
             x=["Sueldo Fijo", "Sueldo Variable", "TOTAL"],
             y=[sueldo_fijo, variable_nuevo, 0],
-            text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {variable_nuevo:,.0f}", f"S/ {sueldo_nuevo:,.0f}"],
+            text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {variable_nuevo:,.0f}", f"S/. {sueldo_nuevo:,.0f}"],
             textposition="outside",
             connector={"line": {"color": "#10b981"}},
             increasing={"marker": {"color": "#6ee7b7"}},
@@ -496,7 +650,7 @@ with col2:
             measure=["relative", "total"],
             x=["Sueldo Fijo", "TOTAL"],
             y=[sueldo_fijo, 0],
-            text=[f"S/ {sueldo_fijo:,.0f}", f"S/ {sueldo_fijo:,.0f}"],
+            text=[f"S/. {sueldo_fijo:,.0f}", f"S/. {sueldo_fijo:,.0f}"],
             textposition="outside",
             connector={"line": {"color": "#10b981"}},
             increasing={"marker": {"color": "#6ee7b7"}},
@@ -507,7 +661,7 @@ with col2:
         title=dict(text=f"<b>Esquema Nuevo ({porcentaje_pago:.0f}% aplicado)</b>", font=dict(size=14)),
         showlegend=False,
         height=350,
-        yaxis=dict(tickformat=",", tickprefix="S/ ")
+        yaxis=dict(tickformat=",", tickprefix="S/. ")
     )
     
     st.plotly_chart(fig_nuevo, use_container_width=True)
@@ -527,9 +681,9 @@ for e in escenarios:
     datos_escenarios.append({
         "Efectividad": f"{e}%",
         "% Pago Tabla": f"{pago:.0f}%",
-        "Esquema Actual": f"S/ {s_actual:,.0f}",
-        "Esquema Nuevo": f"S/ {s_nuevo:,.0f}",
-        "Diferencia": f"{'+'if dif>=0 else ''}S/ {dif:,.0f}",
+        "Esquema Actual": f"S/. {s_actual:,.0f}",
+        "Esquema Nuevo": f"S/. {s_nuevo:,.0f}",
+        "Diferencia": f"{'+'if dif>=0 else ''}S/. {dif:,.0f}",
         "Beneficio": "✅ Nuevo" if dif > 0 else ("⚖️ Igual" if dif == 0 else "📌 Actual")
     })
 
