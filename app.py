@@ -197,33 +197,69 @@ with st.sidebar:
 # Contenido principal
 st.markdown("### 🎯 Simula tu Efectividad de Ventas")
 
+# Inicializar session_state solo si no existe
+if 'init' not in st.session_state:
+    st.session_state.init = True
+    st.session_state.cuota_val = 100000
+    st.session_state.venta_val = 100000
+    st.session_state.efect_val = 100
+
 # Sección colapsable para inputs detallados
 with st.expander("📝 **Editar Cuota y Venta manualmente**", expanded=False):
     col_input1, col_input2 = st.columns(2)
     
     with col_input1:
-        cuota = st.number_input(
+        nueva_cuota = st.number_input(
             "📊 Cuota Mensual (S/)",
             min_value=1,
-            value=100000,
+            value=st.session_state.cuota_val,
             step=5000,
             help="Tu meta de ventas mensual"
         )
+        if nueva_cuota != st.session_state.cuota_val:
+            st.session_state.cuota_val = nueva_cuota
+            # Recalcular efectividad
+            st.session_state.efect_val = min(max(int((st.session_state.venta_val / nueva_cuota) * 100), 0), 150)
+            st.rerun()
     
     with col_input2:
-        venta_input = st.number_input(
+        nueva_venta = st.number_input(
             "💰 Venta Proyectada (S/)",
             min_value=0,
-            value=100000,
+            value=st.session_state.venta_val,
             step=5000,
-            help="Tu venta estimada o real del mes",
-            key="venta_input"
+            help="Tu venta estimada o real del mes"
         )
+        if nueva_venta != st.session_state.venta_val:
+            st.session_state.venta_val = nueva_venta
+            # Recalcular efectividad
+            st.session_state.efect_val = min(max(int((nueva_venta / st.session_state.cuota_val) * 100), 0), 150)
+            st.rerun()
 
-# Mostrar valores y efectividad en tarjetas compactas
-efectividad_calculada = (venta_input / cuota) * 100 if cuota > 0 else 0
-efectividad = min(max(round(efectividad_calculada), 0), 150)
+# Slider para ajustar efectividad rápidamente
+st.markdown("##### 🎚️ Ajuste rápido de efectividad")
+nueva_efect = st.slider(
+    "Desliza para simular diferentes escenarios",
+    min_value=0,
+    max_value=150,
+    value=st.session_state.efect_val,
+    step=1,
+    format="%d%%",
+    help="Mueve el slider para ver cómo cambia tu sueldo"
+)
 
+# Si el slider cambió, actualizar venta
+if nueva_efect != st.session_state.efect_val:
+    st.session_state.efect_val = nueva_efect
+    st.session_state.venta_val = int((nueva_efect / 100) * st.session_state.cuota_val)
+    st.rerun()
+
+# Obtener valores actuales para mostrar
+cuota = st.session_state.cuota_val
+venta = st.session_state.venta_val
+efectividad = st.session_state.efect_val
+
+# Mostrar valores actualizados en tarjetas compactas
 col_c, col_v, col_e = st.columns(3)
 
 with col_c:
@@ -242,7 +278,7 @@ with col_v:
                 padding: 16px; border-radius: 12px; text-align: center; 
                 border: 1px solid #e2e8f0;">
         <div style="font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">💰 Venta Proyectada</div>
-        <div style="font-size: 1.4rem; font-weight: 700; color: #334155;">S/ {venta_input:,}</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #334155;">S/ {venta:,}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -274,26 +310,7 @@ with col_e:
     </div>
     """, unsafe_allow_html=True)
 
-# Slider para ajustar efectividad rápidamente
-st.markdown("##### 🎚️ Ajuste rápido de efectividad")
-efectividad_slider = st.slider(
-    "Desliza para simular diferentes escenarios",
-    min_value=0,
-    max_value=150,
-    value=efectividad,
-    step=1,
-    format="%d%%",
-    help="Mueve el slider para ver cómo cambia tu sueldo en diferentes escenarios"
-)
-
-# Usar el valor del slider si es diferente al calculado
-if efectividad_slider != efectividad:
-    efectividad = efectividad_slider
-    venta_calculada = (efectividad / 100) * cuota
-else:
-    venta_calculada = venta_input
-
-# Barra visual de progreso con zonas - Colores pastel profesionales
+# Barra visual de progreso con zonas
 st.markdown(f"""
 <div style="margin: 15px 0 25px 0;">
     <div style="position: relative; padding-top: 40px;">
@@ -333,7 +350,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Leyenda de zonas - Colores pastel con mejor contraste
+# Leyenda de zonas
 col_z1, col_z2, col_z3, col_z4 = st.columns(4)
 with col_z1:
     st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:18px;height:18px;background:linear-gradient(180deg,#fecdd3,#fda4af);border-radius:5px;border:1px solid #f9a8d4;"></div><span style="font-size:0.8rem;color:#64748b;font-weight:500;">Crítica (&lt;80%)</span></div>', unsafe_allow_html=True)
