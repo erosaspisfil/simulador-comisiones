@@ -197,45 +197,80 @@ with st.sidebar:
 # Contenido principal
 st.markdown("### 🎯 Simula tu Efectividad de Ventas")
 
-# Campos de Cuota y Venta con formato visible
-col_cuota, col_venta, col_efectividad = st.columns([1, 1, 1])
-
-with col_cuota:
-    st.markdown("**📊 Cuota Mensual**")
-    cuota = st.number_input(
-        "Cuota",
-        min_value=1,
-        value=100000,
-        step=5000,
-        help="Tu meta de ventas mensual",
-        label_visibility="collapsed"
-    )
-    st.markdown(f'<div style="background:#f1f5f9;padding:8px 12px;border-radius:8px;text-align:center;margin-top:-10px;"><span style="color:#64748b;font-size:0.85rem;">S/ </span><span style="font-weight:700;font-size:1.1rem;color:#334155;">{cuota:,}</span></div>', unsafe_allow_html=True)
-
-with col_venta:
-    st.markdown("**💰 Venta Proyectada**")
-    venta_input = st.number_input(
-        "Venta",
-        min_value=0,
-        value=100000,
-        step=5000,
-        help="Tu venta estimada o real del mes",
-        key="venta_input",
-        label_visibility="collapsed"
-    )
-    st.markdown(f'<div style="background:#f1f5f9;padding:8px 12px;border-radius:8px;text-align:center;margin-top:-10px;"><span style="color:#64748b;font-size:0.85rem;">S/ </span><span style="font-weight:700;font-size:1.1rem;color:#334155;">{venta_input:,}</span></div>', unsafe_allow_html=True)
-
-with col_efectividad:
-    efectividad_calculada = (venta_input / cuota) * 100 if cuota > 0 else 0
-    efectividad = min(max(round(efectividad_calculada), 0), 150)
+# Sección colapsable para inputs detallados
+with st.expander("📝 **Editar Cuota y Venta manualmente**", expanded=False):
+    col_input1, col_input2 = st.columns(2)
     
-    st.markdown("**📈 % de Efectividad**")
+    with col_input1:
+        cuota = st.number_input(
+            "📊 Cuota Mensual (S/)",
+            min_value=1,
+            value=100000,
+            step=5000,
+            help="Tu meta de ventas mensual"
+        )
+    
+    with col_input2:
+        venta_input = st.number_input(
+            "💰 Venta Proyectada (S/)",
+            min_value=0,
+            value=100000,
+            step=5000,
+            help="Tu venta estimada o real del mes",
+            key="venta_input"
+        )
+
+# Mostrar valores y efectividad en tarjetas compactas
+efectividad_calculada = (venta_input / cuota) * 100 if cuota > 0 else 0
+efectividad = min(max(round(efectividad_calculada), 0), 150)
+
+col_c, col_v, col_e = st.columns(3)
+
+with col_c:
     st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
-                padding: 20px; border-radius: 12px; text-align: center; 
-                border: 2px solid #93c5fd; margin-top: 4px;">
-        <div style="font-size: 2.2rem; font-weight: 800; color: #1d4ed8;">{efectividad}%</div>
-        <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Venta ÷ Cuota × 100</div>
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+                padding: 16px; border-radius: 12px; text-align: center; 
+                border: 1px solid #e2e8f0;">
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">📊 Cuota Mensual</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #334155;">S/ {cuota:,}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_v:
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+                padding: 16px; border-radius: 12px; text-align: center; 
+                border: 1px solid #e2e8f0;">
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">💰 Venta Proyectada</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #334155;">S/ {venta_input:,}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_e:
+    # Color del borde según la zona
+    if efectividad < 80:
+        border_color = "#fda4af"
+        bg_gradient = "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)"
+        text_color = "#be123c"
+    elif efectividad < 100:
+        border_color = "#fde047"
+        bg_gradient = "linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)"
+        text_color = "#a16207"
+    elif efectividad < 115:
+        border_color = "#86efac"
+        bg_gradient = "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)"
+        text_color = "#15803d"
+    else:
+        border_color = "#7dd3fc"
+        bg_gradient = "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)"
+        text_color = "#0369a1"
+    
+    st.markdown(f"""
+    <div style="background: {bg_gradient}; 
+                padding: 16px; border-radius: 12px; text-align: center; 
+                border: 2px solid {border_color};">
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">📈 % Efectividad</div>
+        <div style="font-size: 1.4rem; font-weight: 800; color: {text_color};">{efectividad}%</div>
     </div>
     """, unsafe_allow_html=True)
 
