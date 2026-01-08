@@ -70,10 +70,10 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    .actual { color: #6366f1; }
-    .nuevo { color: #10b981; }
-    .diferencia-positiva { color: #10b981; }
-    .diferencia-negativa { color: #ef4444; }
+    .actual { color: #818cf8; }
+    .nuevo { color: #34d399; }
+    .diferencia-positiva { color: #22c55e; }
+    .diferencia-negativa { color: #f43f5e; }
     
     .info-box {
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
@@ -197,41 +197,45 @@ with st.sidebar:
 # Contenido principal
 st.markdown("### 🎯 Simula tu Efectividad de Ventas")
 
-# Campos de Cuota y Venta
+# Campos de Cuota y Venta con formato visible
 col_cuota, col_venta, col_efectividad = st.columns([1, 1, 1])
 
 with col_cuota:
+    st.markdown("**📊 Cuota Mensual**")
     cuota = st.number_input(
-        "📊 Cuota Mensual (S/)",
+        "Cuota",
         min_value=1,
         value=100000,
         step=5000,
-        format="%d",
-        help="Tu meta de ventas mensual"
+        help="Tu meta de ventas mensual",
+        label_visibility="collapsed"
     )
+    st.markdown(f'<div style="background:#f1f5f9;padding:8px 12px;border-radius:8px;text-align:center;margin-top:-10px;"><span style="color:#64748b;font-size:0.85rem;">S/ </span><span style="font-weight:700;font-size:1.1rem;color:#334155;">{cuota:,}</span></div>', unsafe_allow_html=True)
 
 with col_venta:
+    st.markdown("**💰 Venta Proyectada**")
     venta_input = st.number_input(
-        "💰 Venta Proyectada (S/)",
+        "Venta",
         min_value=0,
         value=100000,
         step=5000,
-        format="%d",
         help="Tu venta estimada o real del mes",
-        key="venta_input"
+        key="venta_input",
+        label_visibility="collapsed"
     )
+    st.markdown(f'<div style="background:#f1f5f9;padding:8px 12px;border-radius:8px;text-align:center;margin-top:-10px;"><span style="color:#64748b;font-size:0.85rem;">S/ </span><span style="font-weight:700;font-size:1.1rem;color:#334155;">{venta_input:,}</span></div>', unsafe_allow_html=True)
 
 with col_efectividad:
     efectividad_calculada = (venta_input / cuota) * 100 if cuota > 0 else 0
     efectividad = min(max(round(efectividad_calculada), 0), 150)
     
+    st.markdown("**📈 % de Efectividad**")
     st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
-                padding: 16px; border-radius: 12px; text-align: center; 
-                border: 2px solid #0ea5e9; margin-top: 8px;">
-        <div style="font-size: 0.8rem; color: #64748b; font-weight: 500;">% de Efectividad</div>
-        <div style="font-size: 2rem; font-weight: 800; color: #0284c7;">{efectividad}%</div>
-        <div style="font-size: 0.7rem; color: #94a3b8;">Venta ÷ Cuota × 100</div>
+    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+                padding: 20px; border-radius: 12px; text-align: center; 
+                border: 2px solid #93c5fd; margin-top: 4px;">
+        <div style="font-size: 2.2rem; font-weight: 800; color: #1d4ed8;">{efectividad}%</div>
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Venta ÷ Cuota × 100</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -254,56 +258,56 @@ if efectividad_slider != efectividad:
 else:
     venta_calculada = venta_input
 
-# Barra visual de progreso con zonas
+# Barra visual de progreso con zonas - Colores pastel profesionales
 st.markdown(f"""
 <div style="margin: 15px 0 25px 0;">
     <div style="position: relative; padding-top: 40px;">
         <div style="position: absolute; left: {min((efectividad / 150) * 100, 100)}%; transform: translateX(-50%); top: 0; text-align: center;">
-            <div style="background: #1e293b; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; white-space: nowrap;">TÚ: {efectividad}%</div>
-            <div style="width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #1e293b; margin: 0 auto;"></div>
+            <div style="background: #475569; color: white; padding: 5px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">TÚ: {efectividad}%</div>
+            <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #475569; margin: 0 auto;"></div>
         </div>
-        <div style="height: 16px; border-radius: 8px; display: flex; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-            <div style="background: linear-gradient(90deg, #fecaca, #f87171); flex: 80;"></div>
-            <div style="background: linear-gradient(90deg, #fde68a, #fbbf24); flex: 20;"></div>
-            <div style="background: linear-gradient(90deg, #6ee7b7, #10b981); flex: 15;"></div>
-            <div style="background: linear-gradient(90deg, #93c5fd, #3b82f6); flex: 35;"></div>
+        <div style="height: 24px; border-radius: 12px; display: flex; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <div style="background: linear-gradient(180deg, #fecdd3 0%, #fda4af 100%); flex: 80;"></div>
+            <div style="background: linear-gradient(180deg, #fef08a 0%, #fde047 100%); flex: 20;"></div>
+            <div style="background: linear-gradient(180deg, #bbf7d0 0%, #86efac 100%); flex: 15;"></div>
+            <div style="background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 100%); flex: 35;"></div>
         </div>
-        <div style="position: relative; height: 25px; margin-top: 5px;">
+        <div style="position: relative; height: 28px; margin-top: 6px;">
             <div style="position: absolute; left: 0%; transform: translateX(-50%); text-align: center;">
-                <div style="width: 2px; height: 8px; background: #94a3b8; margin: 0 auto;"></div>
-                <div style="font-size: 0.7rem; color: #64748b; font-weight: 600;">0%</div>
+                <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">0%</div>
             </div>
             <div style="position: absolute; left: 53.33%; transform: translateX(-50%); text-align: center;">
-                <div style="width: 2px; height: 8px; background: #ef4444; margin: 0 auto;"></div>
-                <div style="font-size: 0.7rem; color: #ef4444; font-weight: 600;">80%</div>
+                <div style="width: 2px; height: 12px; background: #be123c; margin: 0 auto;"></div>
+                <div style="font-size: 0.8rem; color: #be123c; font-weight: 700;">80%</div>
             </div>
             <div style="position: absolute; left: 66.67%; transform: translateX(-50%); text-align: center;">
-                <div style="width: 2px; height: 8px; background: #f59e0b; margin: 0 auto;"></div>
-                <div style="font-size: 0.7rem; color: #f59e0b; font-weight: 600;">100%</div>
+                <div style="width: 2px; height: 12px; background: #a16207; margin: 0 auto;"></div>
+                <div style="font-size: 0.8rem; color: #a16207; font-weight: 700;">100%</div>
             </div>
             <div style="position: absolute; left: 76.67%; transform: translateX(-50%); text-align: center;">
-                <div style="width: 2px; height: 8px; background: #10b981; margin: 0 auto;"></div>
-                <div style="font-size: 0.7rem; color: #10b981; font-weight: 600;">115%</div>
+                <div style="width: 2px; height: 12px; background: #15803d; margin: 0 auto;"></div>
+                <div style="font-size: 0.8rem; color: #15803d; font-weight: 700;">115%</div>
             </div>
             <div style="position: absolute; left: 100%; transform: translateX(-50%); text-align: center;">
-                <div style="width: 2px; height: 8px; background: #94a3b8; margin: 0 auto;"></div>
-                <div style="font-size: 0.7rem; color: #64748b; font-weight: 600;">150%</div>
+                <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">150%</div>
             </div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Leyenda de zonas
+# Leyenda de zonas - Colores pastel con mejor contraste
 col_z1, col_z2, col_z3, col_z4 = st.columns(4)
 with col_z1:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;background:linear-gradient(90deg,#fecaca,#f87171);border-radius:4px;"></div><span style="font-size:0.75rem;color:#64748b;">Crítica (&lt;80%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:18px;height:18px;background:linear-gradient(180deg,#fecdd3,#fda4af);border-radius:5px;border:1px solid #f9a8d4;"></div><span style="font-size:0.8rem;color:#64748b;font-weight:500;">Crítica (&lt;80%)</span></div>', unsafe_allow_html=True)
 with col_z2:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;background:linear-gradient(90deg,#fde68a,#fbbf24);border-radius:4px;"></div><span style="font-size:0.75rem;color:#64748b;">Recuperación (80-&lt;100%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:18px;height:18px;background:linear-gradient(180deg,#fef08a,#fde047);border-radius:5px;border:1px solid #fde047;"></div><span style="font-size:0.8rem;color:#64748b;font-weight:500;">Recuperación (80-&lt;100%)</span></div>', unsafe_allow_html=True)
 with col_z3:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;background:linear-gradient(90deg,#6ee7b7,#10b981);border-radius:4px;"></div><span style="font-size:0.75rem;color:#64748b;">Cumplimiento (100-&lt;115%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:18px;height:18px;background:linear-gradient(180deg,#bbf7d0,#86efac);border-radius:5px;border:1px solid #86efac;"></div><span style="font-size:0.8rem;color:#64748b;font-weight:500;">Cumplimiento (100-&lt;115%)</span></div>', unsafe_allow_html=True)
 with col_z4:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;background:linear-gradient(90deg,#93c5fd,#3b82f6);border-radius:4px;"></div><span style="font-size:0.75rem;color:#64748b;">Alto Rend. (≥115%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:18px;height:18px;background:linear-gradient(180deg,#bae6fd,#7dd3fc);border-radius:5px;border:1px solid #7dd3fc;"></div><span style="font-size:0.8rem;color:#64748b;font-weight:500;">Alto Rend. (≥115%)</span></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -392,27 +396,27 @@ sueldos_nuevos = [calcular_sueldo_nuevo(sueldo_fijo, sueldo_variable, e) for e i
 
 fig = go.Figure()
 
-fig.add_vrect(x0=0, x1=80, fillcolor="rgba(239, 68, 68, 0.1)", layer="below", line_width=0,
+fig.add_vrect(x0=0, x1=80, fillcolor="rgba(254, 205, 211, 0.4)", layer="below", line_width=0,
               annotation_text="Zona Crítica", annotation_position="top left",
-              annotation=dict(font_size=10, font_color="#dc2626"))
+              annotation=dict(font_size=10, font_color="#be123c"))
 
-fig.add_vrect(x0=80, x1=100, fillcolor="rgba(245, 158, 11, 0.1)", layer="below", line_width=0,
+fig.add_vrect(x0=80, x1=100, fillcolor="rgba(254, 240, 138, 0.4)", layer="below", line_width=0,
               annotation_text="Recuperación", annotation_position="top left",
-              annotation=dict(font_size=10, font_color="#d97706"))
+              annotation=dict(font_size=10, font_color="#a16207"))
 
-fig.add_vrect(x0=100, x1=115, fillcolor="rgba(16, 185, 129, 0.1)", layer="below", line_width=0,
+fig.add_vrect(x0=100, x1=115, fillcolor="rgba(187, 247, 208, 0.4)", layer="below", line_width=0,
               annotation_text="Cumplimiento", annotation_position="top left",
-              annotation=dict(font_size=10, font_color="#059669"))
+              annotation=dict(font_size=10, font_color="#15803d"))
 
-fig.add_vrect(x0=115, x1=150, fillcolor="rgba(59, 130, 246, 0.1)", layer="below", line_width=0,
+fig.add_vrect(x0=115, x1=150, fillcolor="rgba(186, 230, 253, 0.4)", layer="below", line_width=0,
               annotation_text="Alto Rend.", annotation_position="top left",
-              annotation=dict(font_size=10, font_color="#2563eb"))
+              annotation=dict(font_size=10, font_color="#0369a1"))
 
 fig.add_trace(go.Scatter(
     x=efectividades,
     y=sueldos_actuales,
     name="Esquema Actual",
-    line=dict(color="#6366f1", width=3),
+    line=dict(color="#818cf8", width=3),
     hovertemplate="Efectividad: %{x}%<br>Sueldo Actual: S/ %{y:,.0f}<extra></extra>"
 ))
 
@@ -420,7 +424,7 @@ fig.add_trace(go.Scatter(
     x=efectividades,
     y=sueldos_nuevos,
     name="Esquema Nuevo",
-    line=dict(color="#10b981", width=3),
+    line=dict(color="#34d399", width=3),
     hovertemplate="Efectividad: %{x}%<br>Sueldo Nuevo: S/ %{y:,.0f}<extra></extra>"
 ))
 
@@ -429,7 +433,7 @@ fig.add_trace(go.Scatter(
     y=[sueldo_actual],
     mode="markers",
     name="Tu posición (Actual)",
-    marker=dict(color="#6366f1", size=15, symbol="circle", line=dict(width=2, color="white")),
+    marker=dict(color="#818cf8", size=15, symbol="circle", line=dict(width=2, color="white")),
     hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Actual: S/ {sueldo_actual:,.0f}<extra></extra>"
 ))
 
@@ -438,11 +442,11 @@ fig.add_trace(go.Scatter(
     y=[sueldo_nuevo],
     mode="markers",
     name="Tu posición (Nuevo)",
-    marker=dict(color="#10b981", size=15, symbol="diamond", line=dict(width=2, color="white")),
+    marker=dict(color="#34d399", size=15, symbol="diamond", line=dict(width=2, color="white")),
     hovertemplate=f"Tu Efectividad: {efectividad}%<br>Sueldo Nuevo: S/ {sueldo_nuevo:,.0f}<extra></extra>"
 ))
 
-for x_val, color in [(80, "#ef4444"), (100, "#f59e0b"), (115, "#10b981")]:
+for x_val, color in [(80, "#e11d48"), (100, "#ca8a04"), (115, "#16a34a")]:
     fig.add_vline(x=x_val, line_dash="dash", line_color=color, line_width=1.5)
 
 fig.update_layout(
@@ -486,37 +490,37 @@ col_k1, col_k2, col_k3, col_k4 = st.columns(4)
 
 with col_k1:
     st.markdown("""
-    <div style="background: #fee2e2; padding: 16px; border-radius: 12px; text-align: center;">
-        <div style="font-weight: 700; color: #ef4444; font-size: 1.1rem;">&lt;80%</div>
-        <div style="font-size: 0.85rem; color: #475569; margin: 4px 0;">→ 0%</div>
-        <div style="font-size: 0.75rem; color: #94a3b8;">Sin variable</div>
+    <div style="background: linear-gradient(135deg, #ffe4e6, #fecdd3); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #fda4af;">
+        <div style="font-weight: 700; color: #be123c; font-size: 1.1rem;">&lt;80%</div>
+        <div style="font-size: 0.85rem; color: #881337; margin: 6px 0;">→ 0%</div>
+        <div style="font-size: 0.75rem; color: #9f1239;">Sin variable</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col_k2:
     st.markdown("""
-    <div style="background: #fef3c7; padding: 16px; border-radius: 12px; text-align: center;">
-        <div style="font-weight: 700; color: #f59e0b; font-size: 1.1rem;">80% - &lt;100%</div>
-        <div style="font-size: 0.85rem; color: #475569; margin: 4px 0;">→ 70% - 98.5%</div>
-        <div style="font-size: 0.75rem; color: #94a3b8;">Recuperación</div>
+    <div style="background: linear-gradient(135deg, #fef9c3, #fef08a); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #fde047;">
+        <div style="font-weight: 700; color: #a16207; font-size: 1.1rem;">80% - &lt;100%</div>
+        <div style="font-size: 0.85rem; color: #854d0e; margin: 6px 0;">→ 70% - 98.5%</div>
+        <div style="font-size: 0.75rem; color: #a16207;">Recuperación</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col_k3:
     st.markdown("""
-    <div style="background: #d1fae5; padding: 16px; border-radius: 12px; text-align: center;">
-        <div style="font-weight: 700; color: #10b981; font-size: 1.1rem;">100% - &lt;115%</div>
-        <div style="font-size: 0.85rem; color: #475569; margin: 4px 0;">→ 100% - 128%</div>
-        <div style="font-size: 0.75rem; color: #94a3b8;">Cumplimiento</div>
+    <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #86efac;">
+        <div style="font-weight: 700; color: #15803d; font-size: 1.1rem;">100% - &lt;115%</div>
+        <div style="font-size: 0.85rem; color: #166534; margin: 6px 0;">→ 100% - 128%</div>
+        <div style="font-size: 0.75rem; color: #15803d;">Cumplimiento</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col_k4:
     st.markdown("""
-    <div style="background: #dbeafe; padding: 16px; border-radius: 12px; text-align: center;">
-        <div style="font-weight: 700; color: #3b82f6; font-size: 1.1rem;">≥115%</div>
-        <div style="font-size: 0.85rem; color: #475569; margin: 4px 0;">→ 130%</div>
-        <div style="font-size: 0.75rem; color: #94a3b8;">Máximo</div>
+    <div style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #7dd3fc;">
+        <div style="font-weight: 700; color: #0369a1; font-size: 1.1rem;">≥115%</div>
+        <div style="font-size: 0.85rem; color: #075985; margin: 6px 0;">→ 130%</div>
+        <div style="font-size: 0.75rem; color: #0369a1;">Máximo</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -538,9 +542,9 @@ with col1:
         y=[sueldo_fijo, variable_actual, 0],
         text=[f"S/ {sueldo_fijo:,}", f"S/ {variable_actual:,.0f}", f"S/ {sueldo_actual:,.0f}"],
         textposition="outside",
-        connector={"line": {"color": "#6366f1"}},
-        increasing={"marker": {"color": "#818cf8"}},
-        totals={"marker": {"color": "#6366f1"}}
+        connector={"line": {"color": "#a5b4fc"}},
+        increasing={"marker": {"color": "#c7d2fe"}},
+        totals={"marker": {"color": "#818cf8"}}
     ))
     
     fig_actual.update_layout(
@@ -565,9 +569,9 @@ with col2:
             y=[sueldo_fijo, variable_nuevo, 0],
             text=[f"S/ {sueldo_fijo:,}", f"S/ {variable_nuevo:,.0f}", f"S/ {sueldo_nuevo:,.0f}"],
             textposition="outside",
-            connector={"line": {"color": "#10b981"}},
-            increasing={"marker": {"color": "#6ee7b7"}},
-            totals={"marker": {"color": "#10b981"}}
+            connector={"line": {"color": "#6ee7b7"}},
+            increasing={"marker": {"color": "#a7f3d0"}},
+            totals={"marker": {"color": "#34d399"}}
         ))
     else:
         fig_nuevo = go.Figure(go.Waterfall(
@@ -578,9 +582,9 @@ with col2:
             y=[sueldo_fijo, 0],
             text=[f"S/ {sueldo_fijo:,}", f"S/ {sueldo_fijo:,}"],
             textposition="outside",
-            connector={"line": {"color": "#10b981"}},
-            increasing={"marker": {"color": "#6ee7b7"}},
-            totals={"marker": {"color": "#10b981"}}
+            connector={"line": {"color": "#6ee7b7"}},
+            increasing={"marker": {"color": "#a7f3d0"}},
+            totals={"marker": {"color": "#34d399"}}
         ))
     
     fig_nuevo.update_layout(
