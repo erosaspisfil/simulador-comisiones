@@ -819,7 +819,7 @@ with col1:
             <li><strong>Entre 80% y 95%:</strong> Pago desde 71.5%, incremento de 1.5% por cada 1%</li>
             <li><strong>Entre 95% y 99%:</strong> Incremento de 1% por cada 1%</li>
             <li><strong>Al 100%:</strong> Recibes exactamente el 100% de tu sueldo variable</li>
-            <li><strong>Entre 101% y 114%:</strong> Incremento de 2% por cada 1% adicional</li>
+            <li><strong>Entre 101% y 115%:</strong> Incremento de 2% por cada 1% adicional</li>
             <li><strong>115% o más:</strong> Tu multiplicador es 130% (máximo)</li>
         </ul>
     </div>
