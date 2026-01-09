@@ -127,8 +127,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Función para obtener el porcentaje de pago según la tabla
+# Función para obtener el porcentaje de pago según la tabla oficial
 def obtener_porcentaje_pago(efectividad):
+    """
+    Retorna el porcentaje de pago según la tabla de equivalencias oficial.
+    
+    Rangos:
+    - Menos de 80%: 0%
+    - 80% a 95%: 71.5% + (efectividad - 80) * 1.5
+    - 96% a 99%: incremento de 1% por cada 1%
+    - 100%: 100%
+    - 101% a 114%: 100% + (efectividad - 100) * 2
+    - 115% o más: 130% (límite máximo)
+    """
     if efectividad < 80:
         return 0
     elif efectividad >= 115:
@@ -136,9 +147,15 @@ def obtener_porcentaje_pago(efectividad):
     elif efectividad == 100:
         return 100
     elif efectividad > 100:
+        # Entre 101% y 114%: cada 1% adicional = 2% más de pago
         return 100 + (efectividad - 100) * 2
+    elif efectividad >= 96:
+        # Entre 96% y 99%: incremento de 1% por cada 1%
+        # 96% = 95%, 97% = 96%, 98% = 97%, 99% = 98%
+        return efectividad - 1
     else:
-        return 70 + (efectividad - 80) * 1.5
+        # Entre 80% y 95%: 71.5% + 1.5% por cada 1% adicional
+        return 71.5 + (efectividad - 80) * 1.5
 
 # Función para calcular sueldo esquema actual
 def calcular_sueldo_actual(sueldo_fijo, sueldo_variable, efectividad):
@@ -552,8 +569,8 @@ with col_k1:
 with col_k2:
     st.markdown("""
     <div style="background: linear-gradient(135deg, #fef9c3, #fef08a); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #fde047;">
-        <div style="font-weight: 700; color: #a16207; font-size: 1.1rem;">80% - &lt;100%</div>
-        <div style="font-size: 0.85rem; color: #854d0e; margin: 6px 0;">→ 70% - 98.5%</div>
+        <div style="font-weight: 700; color: #a16207; font-size: 1.1rem;">80% - 99%</div>
+        <div style="font-size: 0.85rem; color: #854d0e; margin: 6px 0;">→ 71.5% - 98%</div>
         <div style="font-size: 0.75rem; color: #a16207;">Recuperación</div>
     </div>
     """, unsafe_allow_html=True)
@@ -561,7 +578,7 @@ with col_k2:
 with col_k3:
     st.markdown("""
     <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #86efac;">
-        <div style="font-weight: 700; color: #15803d; font-size: 1.1rem;">100% - &lt;115%</div>
+        <div style="font-weight: 700; color: #15803d; font-size: 1.1rem;">100% - 114%</div>
         <div style="font-size: 0.85rem; color: #166534; margin: 6px 0;">→ 100% - 128%</div>
         <div style="font-size: 0.75rem; color: #15803d;">Cumplimiento</div>
     </div>
@@ -571,7 +588,7 @@ with col_k4:
     st.markdown("""
     <div style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); padding: 18px; border-radius: 12px; text-align: center; border: 1px solid #7dd3fc;">
         <div style="font-weight: 700; color: #0369a1; font-size: 1.1rem;">≥115%</div>
-        <div style="font-size: 0.85rem; color: #075985; margin: 6px 0;">→ 130%</div>
+        <div style="font-size: 0.85rem; color: #075985; margin: 6px 0;">→ 130% (límite)</div>
         <div style="font-size: 0.75rem; color: #0369a1;">Máximo</div>
     </div>
     """, unsafe_allow_html=True)
@@ -648,21 +665,105 @@ with col2:
     
     st.plotly_chart(fig_nuevo, use_container_width=True)
 
-# Tabla comparativa de escenarios
+# Tabla de Equivalencias Oficial
+st.markdown("### 📊 Tabla de Equivalencias: Efectividad → % Pago")
+
+with st.expander("📖 **Ver tabla completa de equivalencias**", expanded=False):
+    col_t1, col_t2, col_t3 = st.columns(3)
+    
+    with col_t1:
+        st.markdown("**🔴 Zona Crítica**")
+        st.markdown("""
+        | Efectividad | % Pago |
+        |:-----------:|:------:|
+        | < 80% | 0% |
+        """)
+        
+        st.markdown("**🟡 Zona Recuperación (80-95%)**")
+        tabla_80_95 = ""
+        for e in range(80, 96):
+            pago = obtener_porcentaje_pago(e)
+            tabla_80_95 += f"| {e}% | {pago:.1f}% |\n"
+        st.markdown(f"""
+        | Efectividad | % Pago |
+        |:-----------:|:------:|
+        {tabla_80_95}
+        """)
+    
+    with col_t2:
+        st.markdown("**🟡 Zona Recuperación (96-99%)**")
+        tabla_96_99 = ""
+        for e in range(96, 100):
+            pago = obtener_porcentaje_pago(e)
+            tabla_96_99 += f"| {e}% | {pago:.1f}% |\n"
+        st.markdown(f"""
+        | Efectividad | % Pago |
+        |:-----------:|:------:|
+        {tabla_96_99}
+        """)
+        
+        st.markdown("**🟢 Zona Cumplimiento (100-114%)**")
+        tabla_100_114 = ""
+        for e in range(100, 115):
+            pago = obtener_porcentaje_pago(e)
+            tabla_100_114 += f"| {e}% | {pago:.0f}% |\n"
+        st.markdown(f"""
+        | Efectividad | % Pago |
+        |:-----------:|:------:|
+        {tabla_100_114}
+        """)
+    
+    with col_t3:
+        st.markdown("**🔵 Zona Alto Rendimiento (≥115%)**")
+        st.markdown("""
+        | Efectividad | % Pago |
+        |:-----------:|:------:|
+        | 115% | 130% |
+        | 116%+ | 130% (límite) |
+        """)
+        
+        st.markdown("---")
+        st.markdown("""
+        **📌 Fórmulas:**
+        - **80-95%:** 71.5% + (Efect-80) × 1.5
+        - **96-99%:** Efectividad - 1
+        - **100%:** 100%
+        - **101-114%:** 100% + (Efect-100) × 2
+        - **≥115%:** 130% (tope)
+        """)
+
+# Tabla comparativa de escenarios - TODOS los niveles de la escala
 st.markdown("### 📋 Tabla de Escenarios Clave")
 
-escenarios = [59, 80, 88, 90, 95, 100, 105, 109, 115, 120, 130]
+# Crear lista completa de escenarios según la tabla oficial
+escenarios_completos = (
+    [59] +  # Ejemplo por debajo del 80%
+    list(range(80, 116)) +  # Del 80% al 115% (todos los valores)
+    [120, 130, 150]  # Ejemplos por encima del límite
+)
+
 datos_escenarios = []
 
-for e in escenarios:
+for e in escenarios_completos:
     s_actual = calcular_sueldo_actual(sueldo_fijo, sueldo_variable, e)
     s_nuevo = calcular_sueldo_nuevo(sueldo_fijo, sueldo_variable, e)
     dif = s_nuevo - s_actual
     pago = obtener_porcentaje_pago(e)
     
+    # Determinar zona/color
+    if e < 80:
+        zona = "🔴 Crítica"
+    elif e < 100:
+        zona = "🟡 Recuperación"
+    elif e < 115:
+        zona = "🟢 Cumplimiento"
+    else:
+        zona = "🔵 Alto Rend."
+    
     datos_escenarios.append({
+        "Zona": zona,
         "Efectividad": f"{e}%",
-        "% Pago Tabla": f"{pago:.0f}%",
+        "% Pago Tabla": f"{pago:.1f}%" if pago % 1 != 0 else f"{pago:.0f}%",
         "Esquema Actual": f"S/ {s_actual:,.0f}",
         "Esquema Nuevo": f"S/ {s_nuevo:,.0f}",
         "Diferencia": f"{'+'if dif>=0 else ''}S/ {dif:,.0f}",
@@ -670,7 +771,30 @@ for e in escenarios:
     })
 
 df_escenarios = pd.DataFrame(datos_escenarios)
-st.dataframe(df_escenarios, use_container_width=True, hide_index=True)
+
+# Filtro por zona
+zonas_disponibles = ["Todas"] + list(df_escenarios["Zona"].unique())
+zona_seleccionada = st.selectbox(
+    "🔍 Filtrar por zona:",
+    zonas_disponibles,
+    index=0
+)
+
+if zona_seleccionada != "Todas":
+    df_filtrado = df_escenarios[df_escenarios["Zona"] == zona_seleccionada]
+else:
+    df_filtrado = df_escenarios
+
+# Mostrar con altura fija y scroll
+st.dataframe(
+    df_filtrado, 
+    use_container_width=True, 
+    hide_index=True,
+    height=400
+)
+
+# Mostrar resumen de la tabla
+st.caption(f"📊 Mostrando {len(df_filtrado)} de {len(df_escenarios)} escenarios")
 
 # Resumen ejecutivo
 st.markdown("---")
@@ -691,10 +815,11 @@ with col1:
     <div class="info-box">
         <h4 style="margin:0 0 10px 0;">🔑 Puntos Clave del Nuevo Esquema</h4>
         <ul style="margin:0; padding-left: 20px;">
-            <li><strong>Por debajo del 80%:</strong> Solo recibes sueldo fijo (no hay variable)</li>
-            <li><strong>Entre 80% y &lt;100%:</strong> El % de pago es menor que tu efectividad</li>
+            <li><strong>Por debajo del 80%:</strong> Solo recibes sueldo fijo (0% variable)</li>
+            <li><strong>Entre 80% y 95%:</strong> Pago desde 71.5%, incremento de 1.5% por cada 1%</li>
+            <li><strong>Entre 96% y 99%:</strong> Incremento de 1% por cada 1%</li>
             <li><strong>Al 100%:</strong> Recibes exactamente el 100% de tu sueldo variable</li>
-            <li><strong>Por encima del 100%:</strong> Ganas más que con el esquema actual</li>
+            <li><strong>Entre 101% y 114%:</strong> Incremento de 2% por cada 1% adicional</li>
             <li><strong>115% o más:</strong> Tu multiplicador es 130% (máximo)</li>
         </ul>
     </div>
