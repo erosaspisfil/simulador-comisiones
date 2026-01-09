@@ -150,7 +150,7 @@ def obtener_porcentaje_pago(efectividad):
         # Entre 101% y 114%: cada 1% adicional = 2% más de pago
         return 100 + (efectividad - 100) * 2
     elif efectividad >= 96:
-        # Entre 96% y 99%: incremento de 1% por cada 1%
+        # Entre 95% y 99%: incremento de 1% por cada 1%
         # 96% = 95%, 97% = 96%, 98% = 97%, 99% = 98%
         return efectividad - 1
     else:
