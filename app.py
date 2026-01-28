@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+from datetime import datetime, timezone, timedelta
 
 # Configuracion de pagina
 st.set_page_config(
@@ -26,18 +27,20 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Mantener header visible para el boton del sidebar */
+    /* Header de Streamlit - estilo limpio */
     header[data-testid="stHeader"] {
-        background: transparent;
-        backdrop-filter: none;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        height: 3.5rem;
     }
 
-    /* Sidebar - asegurar visibilidad y estilo */
+    /* Sidebar principal */
     [data-testid="stSidebar"] {
         display: block !important;
         min-width: 320px;
         background: #ffffff;
         border-right: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
     }
 
     [data-testid="stSidebar"] > div:first-child {
@@ -48,13 +51,44 @@ st.markdown("""
         padding: 0;
     }
 
+    /* Control de sidebar colapsado */
     [data-testid="stSidebarCollapsedControl"] {
         display: flex !important;
     }
 
-    /* Boton de colapsar sidebar */
-    button[data-testid="stSidebarCollapseButton"] {
-        color: #64748b;
+    /* Boton de colapsar/expandir sidebar */
+    button[data-testid="baseButton-headerNoPadding"] {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #64748b !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
+
+    button[data-testid="baseButton-headerNoPadding"]:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+    }
+
+    button[data-testid="baseButton-headerNoPadding"] svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* Boton dentro del sidebar */
+    [data-testid="stSidebar"] button[data-testid="baseButton-headerNoPadding"] {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 100;
     }
 
     /* Sidebar header */
@@ -62,7 +96,9 @@ st.markdown("""
         background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         padding: 1.25rem 1.5rem;
         border-radius: 12px;
+        margin-top: 2.5rem;
         margin-bottom: 1.5rem;
+        position: relative;
     }
 
     .sidebar-header h2 {
@@ -220,12 +256,12 @@ st.markdown("""
     /* Header principal */
     .main-header {
         background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
-        padding: 2.5rem 3rem;
-        border-radius: 20px;
-        margin-bottom: 2rem;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 10px 40px rgba(30, 41, 59, 0.2), 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 30px rgba(30, 41, 59, 0.15), 0 2px 6px rgba(0,0,0,0.08);
     }
 
     .main-header::before {
@@ -242,33 +278,33 @@ st.markdown("""
     .main-header .header-badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         background: rgba(99, 102, 241, 0.2);
         border: 1px solid rgba(99, 102, 241, 0.3);
         color: #a5b4fc;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 16px;
+        font-size: 0.6875rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
 
     .main-header h1 {
         color: #ffffff;
-        font-size: 2.25rem;
-        font-weight: 800;
+        font-size: 1.75rem;
+        font-weight: 700;
         margin: 0;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
         position: relative;
         z-index: 1;
     }
 
     .main-header p {
         color: #94a3b8;
-        font-size: 1.0625rem;
-        margin-top: 0.75rem;
+        font-size: 0.9375rem;
+        margin-top: 0.5rem;
         font-weight: 400;
         position: relative;
         z-index: 1;
@@ -548,6 +584,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# Funcion para obtener el saludo segun la hora de Lima, Peru (GMT-5)
+def obtener_saludo():
+    """Retorna el saludo e icono apropiado segun la hora en Lima, Peru (GMT-5)."""
+    utc_now = datetime.now(timezone.utc)
+    lima_offset = timedelta(hours=-5)
+    lima_time = utc_now + lima_offset
+    hora = lima_time.hour
+
+    if 6 <= hora < 12:
+        return "Buenos dias", "☀️"
+    elif 12 <= hora < 18:
+        return "Buenas tardes", "🌤️"
+    else:
+        return "Buenas noches", "🌙"
+
+
 # Funcion para obtener el porcentaje de pago segun la tabla oficial
 def obtener_porcentaje_pago(efectividad):
     """
@@ -611,9 +663,17 @@ st.markdown("""
 
 # Sidebar con parametros
 with st.sidebar:
+    # Saludo dinamico basado en hora de Lima
+    saludo, icono = obtener_saludo()
+    st.markdown(f"""
+    <div style="margin-top: 2rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.25rem; font-weight: 600; color: #334155;">{icono} {saludo}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Header del sidebar
     st.markdown("""
-    <div class="sidebar-header">
+    <div class="sidebar-header" style="margin-top: 0.75rem;">
         <h2>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
@@ -850,9 +910,9 @@ with col_z1:
 with col_z2:
     st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#fde68a;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Recuperacion (80-99%)</span></div>', unsafe_allow_html=True)
 with col_z3:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#bbf7d0;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Cumplimiento (100-114%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#bbf7d0;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Cumplimiento (100-115%)</span></div>', unsafe_allow_html=True)
 with col_z4:
-    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#bfdbfe;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Alto Rend. (115-130%)</span></div>', unsafe_allow_html=True)
+    st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#bfdbfe;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Alto Rend. (+115-130%)</span></div>', unsafe_allow_html=True)
 with col_z5:
     st.markdown('<div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:#e9d5ff;border-radius:3px;"></div><span style="font-size:0.75rem;color:#64748b;">Excepcional (&gt;130%)</span></div>', unsafe_allow_html=True)
 
@@ -1071,7 +1131,7 @@ with col_k2:
 with col_k3:
     st.markdown("""
     <div class="key-card" style="border-top: 3px solid #059669;">
-        <div class="key-card-title" style="color: #059669;">100-114%</div>
+        <div class="key-card-title" style="color: #059669;">100-115%</div>
         <div class="key-card-subtitle" style="color: #64748b;">→ 100% - 128%</div>
         <div class="key-card-label" style="color: #059669;">Cumplimiento</div>
     </div>
@@ -1080,7 +1140,7 @@ with col_k3:
 with col_k4:
     st.markdown("""
     <div class="key-card" style="border-top: 3px solid #2563eb;">
-        <div class="key-card-title" style="color: #2563eb;">115-130%</div>
+        <div class="key-card-title" style="color: #2563eb;">+115-130%</div>
         <div class="key-card-subtitle" style="color: #64748b;">→ 130%</div>
         <div class="key-card-label" style="color: #2563eb;">Alto Rend.</div>
     </div>
@@ -1099,78 +1159,186 @@ with col_k5:
 st.markdown('<div class="section-header">Tabla de Equivalencias</div>', unsafe_allow_html=True)
 
 with st.expander("Ver tabla completa de equivalencias", expanded=False):
+    # Estilos para las tablas
+    st.markdown("""
+    <style>
+        .equiv-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        .equiv-table th {
+            background: #f8fafc;
+            padding: 0.625rem 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .equiv-table td {
+            padding: 0.5rem 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+        }
+        .equiv-table tr:hover td {
+            background: #f8fafc;
+        }
+        .zone-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+        }
+        .zone-title-red { background: #fef2f2; color: #dc2626; }
+        .zone-title-yellow { background: #fffbeb; color: #d97706; }
+        .zone-title-green { background: #f0fdf4; color: #059669; }
+        .zone-title-blue { background: #eff6ff; color: #2563eb; }
+        .zone-title-purple { background: #faf5ff; color: #7c3aed; }
+        .formula-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .formula-card h4 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.875rem;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .formula-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.375rem 0;
+            font-size: 0.8125rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .formula-item:last-child { border-bottom: none; }
+        .formula-range { color: #64748b; font-weight: 500; }
+        .formula-calc { color: #334155; font-family: 'SF Mono', Monaco, monospace; font-size: 0.75rem; }
+    </style>
+    """, unsafe_allow_html=True)
+
     col_t1, col_t2, col_t3 = st.columns(3)
 
     with col_t1:
-        st.markdown("**Zona Critica**")
+        # Zona Critica
+        st.markdown('<div class="zone-title zone-title-red">🚫 Zona Critica</div>', unsafe_allow_html=True)
         st.markdown("""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        | < 80% | 0% |
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody><tr><td>&lt; 80%</td><td><strong>0%</strong></td></tr></tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
-        st.markdown("**Zona Recuperacion (80-95%)**")
-        tabla_80_95 = ""
+        # Zona Recuperacion 80-95
+        st.markdown('<div class="zone-title zone-title-yellow">📈 Recuperacion (80-95%)</div>', unsafe_allow_html=True)
+        rows_80_95 = ""
         for e in range(80, 96):
             pago = obtener_porcentaje_pago(e)
-            tabla_80_95 += f"| {e}% | {pago:.1f}% |\n"
+            rows_80_95 += f"<tr><td>{e}%</td><td>{pago:.1f}%</td></tr>"
         st.markdown(f"""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        {tabla_80_95}
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody>{rows_80_95}</tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
     with col_t2:
-        st.markdown("**Zona Recuperacion (96-99%)**")
-        tabla_96_99 = ""
+        # Zona Recuperacion 96-99
+        st.markdown('<div class="zone-title zone-title-yellow">📈 Recuperacion (96-99%)</div>', unsafe_allow_html=True)
+        rows_96_99 = ""
         for e in range(96, 100):
             pago = obtener_porcentaje_pago(e)
-            tabla_96_99 += f"| {e}% | {pago:.1f}% |\n"
+            rows_96_99 += f"<tr><td>{e}%</td><td>{pago:.1f}%</td></tr>"
         st.markdown(f"""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        {tabla_96_99}
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody>{rows_96_99}</tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
-        st.markdown("**Zona Cumplimiento (100-114%)**")
-        tabla_100_114 = ""
-        for e in range(100, 115):
+        # Zona Cumplimiento 100-115
+        st.markdown('<div class="zone-title zone-title-green">✅ Cumplimiento (100-115%)</div>', unsafe_allow_html=True)
+        rows_100_115 = ""
+        for e in range(100, 116):
             pago = obtener_porcentaje_pago(e)
-            tabla_100_114 += f"| {e}% | {pago:.0f}% |\n"
+            rows_100_115 += f"<tr><td>{e}%</td><td>{pago:.0f}%</td></tr>"
         st.markdown(f"""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        {tabla_100_114}
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody>{rows_100_115}</tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
     with col_t3:
-        st.markdown("**Zona Alto Rendimiento (115-130%)**")
+        # Zona Alto Rendimiento
+        st.markdown('<div class="zone-title zone-title-blue">🚀 Alto Rendimiento (+115-130%)</div>', unsafe_allow_html=True)
         st.markdown("""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        | 115% - 130% | 130% |
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody>
+                <tr><td>116% - 130%</td><td><strong>130%</strong></td></tr>
+            </tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
-        st.markdown("**Zona Excepcional (>130%)**")
+        # Zona Excepcional
+        st.markdown('<div class="zone-title zone-title-purple">⭐ Excepcional (&gt;130%)</div>', unsafe_allow_html=True)
         st.markdown("""
-        | Efectividad | % Pago |
-        |:-----------:|:------:|
-        | 131% | 131% |
-        | 132% | 132% |
-        | 150% | 150% |
-        | ... | = Efectividad |
-        """)
+        <table class="equiv-table">
+            <thead><tr><th>Efectividad</th><th>% Pago</th></tr></thead>
+            <tbody>
+                <tr><td>131%</td><td>131%</td></tr>
+                <tr><td>132%</td><td>132%</td></tr>
+                <tr><td>140%</td><td>140%</td></tr>
+                <tr><td>150%</td><td>150%</td></tr>
+                <tr><td>175%</td><td>175%</td></tr>
+                <tr><td>200%</td><td>200%</td></tr>
+                <tr><td style="color:#7c3aed;"><em>n%</em></td><td style="color:#7c3aed;"><em>= n%</em></td></tr>
+            </tbody>
+        </table>
+        """, unsafe_allow_html=True)
 
-        st.markdown("---")
+        # Formulas
         st.markdown("""
-        **Formulas:**
-        - **80-95%:** 71.5% + (Efect-80) x 1.5
-        - **96-99%:** Efectividad - 1
-        - **100%:** 100%
-        - **101-114%:** 100% + (Efect-100) x 2
-        - **115-130%:** 130%
-        - **>130%:** = Efectividad
-        """)
+        <div class="formula-card">
+            <h4>📐 Formulas de Calculo</h4>
+            <div class="formula-item">
+                <span class="formula-range">80-95%</span>
+                <span class="formula-calc">71.5 + (E-80)×1.5</span>
+            </div>
+            <div class="formula-item">
+                <span class="formula-range">96-99%</span>
+                <span class="formula-calc">E - 1</span>
+            </div>
+            <div class="formula-item">
+                <span class="formula-range">100%</span>
+                <span class="formula-calc">100%</span>
+            </div>
+            <div class="formula-item">
+                <span class="formula-range">101-115%</span>
+                <span class="formula-calc">100 + (E-100)×2</span>
+            </div>
+            <div class="formula-item">
+                <span class="formula-range">116-130%</span>
+                <span class="formula-calc">130%</span>
+            </div>
+            <div class="formula-item">
+                <span class="formula-range">&gt;130%</span>
+                <span class="formula-calc">= Efectividad</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Tabla de escenarios
 st.markdown('<div class="section-header">Tabla de Escenarios</div>', unsafe_allow_html=True)
@@ -1178,7 +1346,7 @@ st.markdown('<div class="section-header">Tabla de Escenarios</div>', unsafe_allo
 escenarios_completos = (
     [59] +
     list(range(80, 116)) +
-    [120, 130, 135, 140, 150, 175, 200]
+    [120, 130, 131, 132, 133, 134, 135, 140, 150, 175, 200]
 )
 
 datos_escenarios = []
